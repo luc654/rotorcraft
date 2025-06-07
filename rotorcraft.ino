@@ -1,5 +1,6 @@
 #include <WiFi.h>
-
+#define yellow 26
+#define white 25
 
 // -------------------- Wifi Setup --------------------
 const char* ssid = "rotorcraft";
@@ -31,15 +32,14 @@ bool waitConnection(){
     }
   }
   int sequence[] = {20, 50, 20, 50, 50, 50};
-  flash(sequence, 6);
+  flash(sequence, 6, yellow);
 }
 
 // -------------------- Led Setup --------------------
 
-int line = 26;
 
 
-void flash(int sequence[], int length) {
+void flash(int sequence[], int length, int line) {
   for (int i = 0; i < length; i = i + 2) {
     digitalWrite(line, HIGH);
     delay(sequence[i]);
@@ -47,10 +47,10 @@ void flash(int sequence[], int length) {
     delay(sequence[i+1]);
   }
 }
-void initLed(){
-  pinMode(line, OUTPUT);
+void initLed(int t){
+  pinMode(t, OUTPUT);
   int sequence[] = {100, 200, 100, 200};
-  flash(sequence, 4);
+  flash(sequence, 4, t);
 
 }
 
@@ -59,13 +59,14 @@ void initLed(){
 
 void setup() {
   Serial.begin(115200);
-  initLed();
+  initLed(26);
+  initLed(25);
   enableServer();
   waitConnection();
 }
 
 void loop() {
-
+  
 }
 
 
