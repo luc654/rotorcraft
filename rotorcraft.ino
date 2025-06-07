@@ -10,7 +10,12 @@ String header;
 
 
 void enableServer() {
+  IPAddress local_ip(192, 168, 1, 1);
+  IPAddress gateway(192, 168, 1, 1);
+  IPAddress subnet(255, 255, 255, 0);
+
   WiFi.mode(WIFI_AP);
+  WiFi.softAPConfig(local_ip, gateway, subnet);
   WiFi.softAP(ssid, pass);
   IPAddress IP = WiFi.softAPIP();
   Serial.print("AP IP address: ");
