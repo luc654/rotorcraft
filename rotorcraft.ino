@@ -18,26 +18,22 @@ void enableServer() {
   IPAddress subnet(255, 255, 255, 0);
 
   WiFi.mode(WIFI_AP);
-  Serial.println("[SERVER] WiFi.mode");
   WiFi.softAPConfig(local_ip, gateway, subnet);
-  Serial.println("[SERVER] WiFi.softAPConfig");
   WiFi.softAP(ssid, pass);
-  Serial.println("[SERVER] WiFi.softAP");
   IPAddress IP = WiFi.softAPIP();
-  Serial.println("[SERVER] IPAddress IP");
   server.begin();
-  Serial.println("[SERVER] server.begin"); 
+  Serial.println("[SERVER] Server enabled");
 }
 
 bool waitConnection() {
   while (!client || !client.connected()) {
     client = server.available();
-    delay(10);  // Yield a bit to prevent watchdog reset
+    delay(10); 
   }
 
-  Serial.println("Connection established");
   int sequence[] = {20, 50, 20, 50, 50, 50};
   flash(sequence, 6, YELLOW);
+  Serial.println("[SERVER] Connection established");
   return true;
 }
 
@@ -99,9 +95,7 @@ void setup() {
   initLed(26);
   initLed(25);
   enableServer();
-  Serial.println("Server enabled");
   waitConnection();
-  Serial.println("Connection established");
 }
 
 void loop() {
