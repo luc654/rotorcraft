@@ -1,5 +1,21 @@
 #include <ESP8266WiFi.h>
 
+// -------------------- Button setup --------------------
+
+#define BUTTON_A 13
+#define BUTTON_B 12
+#define BUTTON_C 14
+
+unsigned long lastButtonTime = 0;
+const unsigned long buttonCooldown = 300; 
+
+
+void initBtns(){
+  pinMode(BUTTON_A, INPUT_PULLUP);
+  pinMode(BUTTON_B, INPUT_PULLUP);
+  pinMode(BUTTON_C, INPUT_PULLUP);
+}
+
 // -------------------- Wifi Setup --------------------
 const char* ssid = "rotorcraft";
 const char* pass = "password123";
@@ -14,10 +30,11 @@ void connectServer() {
   Serial.println("[SERVER] WiFi.begin");             
   Serial.print(ssid);
   Serial.println("[SERVER] Serial.print"); 
-
+  int index = 0;
   while (WiFi.status() != WL_CONNECTED) { 
     delay(1000);
-    Serial.println("[SERVER] delay(1000");
+    Serial.printf("[SERVER] Attempting to connect. (%d) \n", index);
+    index++;
   }
 
     if (client.connect("192.168.1.1", 80)) {
@@ -54,6 +71,7 @@ void initLed(){
 void setup(){
   Serial.begin(115200);
   initLed();
+  initBtns();
   connectServer();
 }
 
@@ -64,8 +82,31 @@ void transmit(int command){
   Serial.printf("[Transmit] %d \n", command);
 }
 
+void handleButtons() {
+  if (millis() - lastButtonTime < buttonCooldown) return;
+
+  if(digitalRead(BUTTON_A) == LOW && digitalRead(BUTTON_C) == LOW){
+    Serial.println("[BTN] A & C");
+
+  } else
+   if (digitalRead(BUTTON_A) == LOW) {
+    Serial.println("[BTN] A");
+    transmit(1);
+    lastButtonTime = millis();
+
+    
+  } else if (digitalRead(BUTTON_B) == LOW) {
+    Serial.println("[BTN] B");
+    lastButtonTime = millis();
+
+
+  } else if (digitalRead(BUTTON_C) == LOW) {
+    Serial.println("[BTN] C");
+    lastButtonTime = millis();
+  }
+}
 
 void loop(){
-  transmit(1);
-  delay(500);
+  delay(100);
+  handleButtons();
 }
