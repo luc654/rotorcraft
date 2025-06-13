@@ -2,6 +2,7 @@
 // #include <String.h>
 #define YELLOW 26
 #define WHITE 25
+#define BUZZER 23
 
 // -------------------- Wifi Setup --------------------
 const char* ssid = "rotorcraft";
@@ -57,6 +58,25 @@ void initLed(int t){
 
 }
 
+// -------------------- Buzzer Setup & Control --------------------
+
+
+bool enableBuzzer = false;
+void initBuzzer(){
+  pinMode(BUZZER, OUTPUT);
+}
+
+void buzz(){
+  tone(BUZZER, 1000); 
+  delay(1000);        
+  noTone(BUZZER);     
+}
+
+void toggleBuzzing(){
+  enableBuzzer = !enableBuzzer;
+}
+
+
 // -------------------- Command Registry --------------------
 
 int registerCommand() {
@@ -84,7 +104,13 @@ void interpretCommand(int command){
       int sequence[] = {50, 50, 50, 50, 50, 50};
       flash(sequence, 4, WHITE);
     } break;
-
+    case 2: {
+      toggleBuzzing();
+      
+    } break;
+    case 3: {
+      buzz();
+    } break;
   }
 }
 
@@ -94,6 +120,7 @@ void setup() {
   Serial.begin(115200);
   initLed(26);
   initLed(25);
+  buzz();
   enableServer();
   waitConnection();
 }
@@ -101,6 +128,11 @@ void setup() {
 void loop() {
   int command = registerCommand();
   interpretCommand(command);
+  delay(100);
+    if(enableBuzzer){
+  buzz();
+  }
+
 }
 
 
