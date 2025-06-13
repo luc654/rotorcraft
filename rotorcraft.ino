@@ -70,7 +70,8 @@ int registerCommand() {
   }
 
   if (client && client.connected() && client.available()) {
-    int command = client.read();
+    // Minus 48 because of ASCII enumeration.
+    int command = client.read() - 48;
     Serial.printf("[REGISTER] %d \n", command);
     return command;
   }
@@ -86,11 +87,6 @@ void interpretCommand(int command){
     case 1: {
       int sequence[] = {50, 50, 50, 50, 50, 50};
       flash(sequence, 4, WHITE);
-    } break;
-
-    case 49: {
-      int sequence[] = {50, 50, 50, 50, 50, 50};
-      flash(sequence, 4, YELLOW);
     } break;
 
   }
