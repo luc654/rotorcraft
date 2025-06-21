@@ -87,7 +87,7 @@ void handleButtons() {
 
   if(digitalRead(BUTTON_A) == LOW && digitalRead(BUTTON_C) == LOW){
     Serial.println("[BTN] A & C");
-    transmit(3);
+    transmit(4);
 
   } else
    if (digitalRead(BUTTON_A) == LOW) {
@@ -104,6 +104,7 @@ void handleButtons() {
 
   } else if (digitalRead(BUTTON_C) == LOW) {
     Serial.println("[BTN] C");
+    transmit(3);
     lastButtonTime = millis();
   }
 }
