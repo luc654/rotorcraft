@@ -2,7 +2,12 @@
 // #include <String.h>
 #define YELLOW 26
 #define WHITE 25
+#define GREEN 25
+
 #define BUZZER 23
+
+#define TRIGGER 5
+#define ECHO 18
 
 // -------------------- Wifi Setup --------------------
 const char* ssid = "rotorcraft";
@@ -58,6 +63,14 @@ void initLed(int t){
 
 }
 
+void ledOn(int line){
+  digitalWrite(line,HIGH);
+}
+void ledOff(int line){
+  digitalWrite(line,LOW);
+}
+
+
 // -------------------- Buzzer Setup & Control --------------------
 
 
@@ -76,7 +89,42 @@ void toggleBuzzing(){
   enableBuzzer = !enableBuzzer;
 }
 
+// -------------------- Ultrasonic Sensor Setup, Control & Algorithmic features --------------------
 
+int thresHold = 100;
+
+void initSensor(){
+  pinMode(TRIGGER, OUTPUT); // Sets the trigPin as an Output
+  pinMode(ECHO, INPUT);
+}
+
+float sensorDistance(){
+  digitalWrite(TRIGGER, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIGGER, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIGGER, LOW);
+  
+  float duration = pulseIn(ECHO, HIGH);
+  return duration * 0.034/2;
+}
+
+float sensorPing(){
+  float cm = sensorDistance();
+  Serial.printf("[PING] Distance %.4f \n", cm);
+  if(cm + 10 < thresHold || cm - 10 > thresHold){
+    if(enableBuzzer){
+      buzz();
+    }
+  };
+  return cm;
+}
+
+void setThreshold(){
+  int cm = sensorDistance();
+  thresHold = cm;
+  Serial.printf("[THRESHOLD] Distance %d\n", cm);
+}
 // -------------------- Command Registry --------------------
 
 int registerCommand() {
@@ -118,9 +166,12 @@ void interpretCommand(int command){
 
 void setup() {
   Serial.begin(115200);
-  initLed(26);
-  initLed(25);
-  buzz();
+  initLed(WHITE);
+  initLed(YELLOW);
+  initLed(GREEN);
+  initSensor();
+
+  setThreshold();
   enableServer();
   waitConnection();
 }
@@ -128,9 +179,11 @@ void setup() {
 void loop() {
   int command = registerCommand();
   interpretCommand(command);
+
+
   delay(100);
     if(enableBuzzer){
-  buzz();
+      sensorPing();
   }
 
 }
