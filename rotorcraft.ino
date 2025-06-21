@@ -2,7 +2,7 @@
 // #include <String.h>
 #define YELLOW 26
 #define WHITE 25
-#define GREEN 25
+#define GREEN 33
 
 #define BUZZER 23
 
