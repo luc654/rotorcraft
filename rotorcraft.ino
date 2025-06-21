@@ -92,7 +92,7 @@ void toggleBuzzing(){
 // -------------------- Ultrasonic Sensor Setup, Control & Algorithmic features --------------------
 
 int thresHold = 100;
-
+int margin = 10;
 void initSensor(){
   pinMode(TRIGGER, OUTPUT); // Sets the trigPin as an Output
   pinMode(ECHO, INPUT);
@@ -109,20 +109,38 @@ float sensorDistance(){
   return duration * 0.034/2;
 }
 
-float sensorPing(){
+void sensorPing(){
   float cm = sensorDistance();
+  bool running = true;
+  bool flag = false;
+  int count = 0;
+  while(running){
   Serial.printf("[PING] Distance %.4f \n", cm);
   if(cm + 10 < thresHold || cm - 10 > thresHold){
+    count++;
+    delay(50);
+  } else {
+    running = false;
+  }
+  if(count > 5){
+    running = false;
+    flag = true;
+  }
+  }
+  if(flag){
     if(enableBuzzer){
       buzz();
     }
-  };
-  return cm;
+  }
 }
 
 void setThreshold(){
   int cm = sensorDistance();
   thresHold = cm;
+  margin = thresHold / 100 * 10;
+  if(margin < 1){
+    margin = 1;
+  }
   Serial.printf("[THRESHOLD] Distance %d\n", cm);
 }
 // -------------------- Command Registry --------------------
@@ -157,6 +175,11 @@ void interpretCommand(int command){
       
     } break;
     case 3: {
+      setThreshold();
+      int sequence[] = {500, 0};
+      flash(sequence, 2, GREEN);
+    } break;
+    case 4: {
       buzz();
     } break;
   }
